@@ -11,4 +11,4 @@ environment:
 
 dependencies:
   meta: ^1.1.7
-  collection: ^1.14.12
+  collection: ^1.14.11
