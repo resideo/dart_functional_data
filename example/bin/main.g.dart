@@ -97,8 +97,7 @@ class Bar$ {
 // ignore_for_file: avoid_classes_with_only_static_members
 // ignore_for_file: non_constant_identifier_names
 // ignore_for_file: avoid_equals_and_hash_code_on_mutable_classes
-abstract class $Baz {
-  const $Baz();
+mixin $Baz {
   math.Point<num> get prefixedField;
   Baz copyWith({math.Point<num> prefixedField}) =>
       Baz(prefixedField: prefixedField ?? this.prefixedField);
