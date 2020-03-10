@@ -42,10 +42,10 @@ class Bar extends $Bar {
   const Bar({this.foo, this.foos, this.driver, this.cache = null});
 }
 
-@FunctionalData()
-class Baz extends $Baz {
+@FunctionalData(type: FunctionalDataGeneratedType.asMixin)
+class Baz with $Baz {
   final math.Point prefixedField;
-  const Baz({this.prefixedField});
+  Baz({this.prefixedField});
 }
 
 main(List<String> arguments) {

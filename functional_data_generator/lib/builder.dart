@@ -1,18 +1,24 @@
 import 'package:analyzer/dart/ast/ast.dart';
 import 'package:analyzer/dart/element/element.dart';
 import 'package:build/build.dart';
-import 'package:collection/collection.dart';
 import 'package:source_gen/source_gen.dart';
 import 'package:functional_data/functional_data.dart';
 
-Builder functionalData(BuilderOptions options) =>
-    new SharedPartBuilder([new FunctionalDataGenerator()], 'functional_data');
+import 'annotation_extensions.dart';
+
+Builder functionalData(BuilderOptions options) {
+  return SharedPartBuilder([FunctionalDataGenerator()], 'functional_data');
+}
 
 class FunctionalDataGenerator extends GeneratorForAnnotation<FunctionalData> {
   @override
   generateForAnnotatedElement(
-          Element element, ConstantReader annotation, BuildStep buildStep) =>
-      _generateDataType(element);
+      Element element, ConstantReader annotation, BuildStep buildStep) {
+    FunctionalData config = FunctionalDataCoding.fromConstantReader(annotation);
+    return _generateDataType(element, config);
+  }
+
+  const FunctionalDataGenerator();
 }
 
 bool elementHasMetaAnnotation(Element e) =>
@@ -20,12 +26,6 @@ bool elementHasMetaAnnotation(Element e) =>
 
 bool isSimpleDataAnnotation(ElementAnnotation a) =>
     a.computeConstantValue().type.name.toString() == "FunctionalData";
-
-class CustomEquality {
-  final Equality equality;
-
-  const CustomEquality(this.equality);
-}
 
 String _getCustomEquality(List<ElementAnnotation> annotations) {
   final annotation = annotations.firstWhere(
@@ -38,7 +38,7 @@ String _getCustomEquality(List<ElementAnnotation> annotations) {
     return null;
 }
 
-String _generateDataType(Element element) {
+String _generateDataType(Element element, FunctionalData config) {
   if (element is! ClassElement)
     throw new Exception(
         'FunctionalData annotation must only be used on classes');
@@ -74,8 +74,17 @@ String _generateDataType(Element element) {
 
   final constructor = 'const \$$className();';
 
-  final dataClass =
-      'abstract class \$$className { ${fieldDeclarations.join()} $constructor $copyWith $toString $equality $hash }';
+  String dataClass;
+  switch (config.type) {
+    case FunctionalDataGeneratedType.asClass:
+      dataClass =
+          'abstract class \$$className { ${fieldDeclarations.join()} $constructor $copyWith $toString $equality $hash }';
+      break;
+    case FunctionalDataGeneratedType.asMixin:
+      dataClass =
+          'mixin \$$className { ${fieldDeclarations.join()} $copyWith $toString $equality $hash }';
+      break;
+  }
   final lensesClass = 'class $className\$ { ${lenses.join()} }';
 
   return '$dataClass $lensesClass';
