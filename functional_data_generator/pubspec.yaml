@@ -7,14 +7,18 @@ authors:
 homepage: https://github.com/spkersten/dart_functional_data
 
 environment:
-  sdk: ">=2.4.0 <3.0.0"
+  sdk: ">=2.7.0 <3.0.0"
 
 dependencies:
   analyzer: ">=0.34.0 <0.39.0"
   build: ^1.1.0
   source_gen: ^0.9.2
   collection: ^1.14.11
-  functional_data: ">=0.2.0 <0.3.0"
+  functional_data:
 
 dev_dependencies:
   build_runner:
+
+dependency_overrides:
+  functional_data:
+    path: ../functional_data

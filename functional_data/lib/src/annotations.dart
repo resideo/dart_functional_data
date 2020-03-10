@@ -1,7 +1,16 @@
 import 'package:collection/collection.dart';
 
+enum FunctionalDataGeneratedType {
+  asClass,
+  asMixin,
+}
+
 class FunctionalData {
-  const FunctionalData();
+  final FunctionalDataGeneratedType type;
+
+  const FunctionalData({
+    FunctionalDataGeneratedType type,
+  }) : type = type ?? FunctionalDataGeneratedType.asClass;
 }
 
 class CustomEquality {

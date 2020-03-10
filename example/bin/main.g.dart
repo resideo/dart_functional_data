@@ -76,16 +76,16 @@ abstract class $Bar {
   bool operator ==(dynamic other) =>
       other.runtimeType == runtimeType &&
       foo == other.foo &&
-      const DeepCollectionEquality().equals(foos, other.foos) &&
+      DeepCollectionEquality().equals(foos, other.foos) &&
       driver == other.driver &&
-      const Ignore().equals(cache, other.cache);
+      Ignore().equals(cache, other.cache);
   @override
   int get hashCode {
     var result = 17;
     result = 37 * result + foo.hashCode;
-    result = 37 * result + const DeepCollectionEquality().hash(foos);
+    result = 37 * result + DeepCollectionEquality().hash(foos);
     result = 37 * result + driver.hashCode;
-    result = 37 * result + const Ignore().hash(cache);
+    result = 37 * result + Ignore().hash(cache);
     return result;
   }
 }
@@ -101,9 +101,8 @@ class Bar$ {
       (s_) => s_.cache, (s_, cache) => s_.copyWith(cache: cache));
 }
 
-abstract class $Baz {
+mixin $Baz {
   math.Point get prefixedField;
-  const $Baz();
   Baz copyWith({math.Point prefixedField}) =>
       Baz(prefixedField: prefixedField ?? this.prefixedField);
   String toString() => "Baz(prefixedField: $prefixedField)";
