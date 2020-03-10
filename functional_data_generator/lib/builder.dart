@@ -56,8 +56,12 @@ String _generateDataType(Element element, FunctionalData config) {
   final fieldDeclarations = fields.map((f) => '${f.type} get ${f.name};');
   final toString =
       'String toString() => "$className(${fields.map((f) => '${f.name}: \$${f.name}').join(', ')})";';
+
   final copyWith =
       '$className copyWith({${fields.map((f) => '${f.type} ${f.name}').join(', ')}}) => $className(${fields.map((f) => '${f.name}: ${f.name} ?? this.${f.name}').join(', ')});';
+
+  final copyWithout =
+      '$className copyWithout({${fields.map((f) => 'bool ${f.name} = false').join(', ')}}) => $className(${fields.map((f) => '${f.name}: ${f.name} == false ? this.${f.name} : null').join(', ')});';
 
   final equality = 'bool operator ==(dynamic other) => ${([
         'other.runtimeType == runtimeType'
@@ -66,25 +70,31 @@ String _generateDataType(Element element, FunctionalData config) {
   final hash =
       '@override int get hashCode { var result = 17; ${fields.map((f) => 'result = 37 * result + ${_generateHash(f)};').join()} return result; }';
 
+  final commonImpl =
+      '${fieldDeclarations.join()} $copyWith $copyWithout $toString $equality $hash';
+
+  final structureSignature =
+      '\$$className implements CopyableFunctionalData<$className>';
+
+  String dataClass;
+  switch (config.type) {
+    case FunctionalDataGeneratedType.asClass:
+      final constructor = 'const \$$className();';
+
+      dataClass =
+          'abstract class $structureSignature { $constructor $commonImpl }';
+      break;
+    case FunctionalDataGeneratedType.asMixin:
+      dataClass = 'mixin $structureSignature { $commonImpl }';
+      break;
+  }
+
   final lenses = fields.map((f) {
     final name = f.name;
     final type = f.type;
     return 'static final $name = Lens<$className, $type>((s_) => s_.$name, (s_, $name) => s_.copyWith($name: $name));';
   });
 
-  final constructor = 'const \$$className();';
-
-  String dataClass;
-  switch (config.type) {
-    case FunctionalDataGeneratedType.asClass:
-      dataClass =
-          'abstract class \$$className { ${fieldDeclarations.join()} $constructor $copyWith $toString $equality $hash }';
-      break;
-    case FunctionalDataGeneratedType.asMixin:
-      dataClass =
-          'mixin \$$className { ${fieldDeclarations.join()} $copyWith $toString $equality $hash }';
-      break;
-  }
   final lensesClass = 'class $className\$ { ${lenses.join()} }';
 
   return '$dataClass $lensesClass';

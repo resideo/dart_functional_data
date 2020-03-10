@@ -75,4 +75,10 @@ main(List<String> arguments) {
       List$.where<Foo>((foo) => foo.name == bar.driver).then(Foo$.number));
   print(driversNumber.of(bar).value);
   // 101
+
+  if (bar is CopyableFunctionalData) {
+    print('original: $bar');
+    final bar2 = bar.copyWithout(foos: true);
+    print('copyWithout: $bar2');
+  }
 }
